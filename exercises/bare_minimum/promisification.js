@@ -1,17 +1,16 @@
 /**
  * Create the promise returning `Async` suffixed versions of the functions below,
  * Promisify them if you can, otherwise roll your own promise returning function
- */ 
+ */
 
-var fs = require('fs');
-var request = require('needle');
-var crypto = require('crypto');
-var Promise = require('bluebird');
+const fs = require('fs');
+const request = require('needle');
+const crypto = require('crypto');
+const Promise = require('bluebird');
 
-// (1) Asyncronous HTTP request
-var getGitHubProfile = function (user, callback) {
-  var url = 'https://api.github.com/users/' + user;
-  var options = {
+const getGitHubProfile = (user, callback) => {
+  const url = 'https://api.github.com/users/' + user;
+  const options = {
     headers: { 'User-Agent': 'request' },
   };
 
@@ -20,49 +19,42 @@ var getGitHubProfile = function (user, callback) {
       callback(err, null);
     } else if (body.message) {
       callback(
-        new Error('Failed to get GitHub profile: ' + body.message),
-        null
-      );
+        new Error('Failed to get GitHub profile: ' + body.message), null);
     } else {
       callback(null, body);
     }
   });
 };
 
-var getGitHubProfileAsync; // TODO
+const getGitHubProfileAsync = Promise.promisify(getGitHubProfile);
 
-
-// (2) Asyncronous token generation
-var generateRandomToken = function(callback) {
-  crypto.randomBytes(20, function(err, buffer) {
+const generateRandomToken = (callback) => {
+  crypto.randomBytes(20, (err, buffer) => {
     if (err) { return callback(err, null); }
     callback(null, buffer.toString('hex'));
   });
 };
 
-var generateRandomTokenAsync; // TODO
+const generateRandomTokenAsync = Promise.promisify(generateRandomToken); // TODO
 
-
-// (3) Asyncronous file manipulation
-var readFileAndMakeItFunny = function(filePath, callback) {
-  fs.readFile(filePath, 'utf8', function(err, file) {
+const readFileAndMakeItFunny = (filePath, callback) => {
+  fs.readFile(filePath, 'utf8', (err, file) => {
     if (err) { return callback(err); }
-   
-    var funnyFile = file.split('\n')
-      .map(function(line) {
+
+    const funnyFile = file.split('\n')
+      .map((line) => {
         return line + ' lol';
       })
       .join('\n');
 
-    callback(funnyFile);
+    callback(null, funnyFile);
   });
 };
 
-var readFileAndMakeItFunnyAsync; // TODO
+const readFileAndMakeItFunnyAsync = Promise.promisify(readFileAndMakeItFunny);
 
-// Export these functions so we can test them and reuse them in later exercises
 module.exports = {
-  getGitHubProfileAsync: getGitHubProfileAsync,
-  generateRandomTokenAsync: generateRandomTokenAsync,
-  readFileAndMakeItFunnyAsync: readFileAndMakeItFunnyAsync
+  getGitHubProfileAsync,
+  generateRandomTokenAsync,
+  readFileAndMakeItFunnyAsync
 };

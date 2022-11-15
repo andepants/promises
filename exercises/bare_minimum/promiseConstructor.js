@@ -4,22 +4,37 @@
  * to the function invocation, while errors should be available in the `catch` block
  */
 
-var fs = require('fs');
-var request = require('needle');
-var Promise = require('bluebird');
+const fs = require('fs');
+const request = require('needle');
+const Promise = require('bluebird');
 
-// This function should retrieve the first line of the file at `filePath`
-var pluckFirstLineFromFileAsync = function(filePath) {
-  // TODO
+const pluckFirstLineFromFileAsync = (filePath) => {
+  return new Promise((res, rej) => {
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        rej(err);
+      } else {
+        res(data.split('\n')[0]);
+      }
+    });
+  });
 };
 
 // This function should retrieve the status code of a GET request to `url`
-var getStatusCodeAsync = function(url) {
-  // TODO
+const getStatusCodeAsync = (url) => {
+  return new Promise((resolve, reject) => {
+    request.get(url, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data.statusCode);
+      }
+    });
+  });
 };
 
 // Export these functions so we can test them and reuse them in later exercises
 module.exports = {
-  getStatusCodeAsync: getStatusCodeAsync,
-  pluckFirstLineFromFileAsync: pluckFirstLineFromFileAsync
+  getStatusCodeAsync,
+  pluckFirstLineFromFileAsync
 };

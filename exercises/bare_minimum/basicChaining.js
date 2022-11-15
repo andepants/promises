@@ -10,14 +10,28 @@
 
 var fs = require('fs');
 var Promise = require('bluebird');
+var {pluckFirstLineFromFileAsync} = require('./promiseConstructor.js');
+var {getGitHubProfileAsync} = require('./promisification.js');
 
-
-
-var fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
-  // TODO
+const fetchProfileAndWriteToFile = function(readFilePath, writeFilePath) {
+  return pluckFirstLineFromFileAsync(readFilePath)
+    .catch((err) => {
+      console.log('Invalid Line!');
+    })
+    .then((user) => {
+      return getGitHubProfileAsync(user);
+    })
+    .catch((err) => {
+      console.log('Request timeout to API!');
+    })
+    .then((body) => {
+      fs.writeFileSync(writeFilePath, JSON.stringify(body));
+    })
+    .catch((err) => {
+      console.log('something went wrong');
+    });
 };
 
-// Export these functions so we can test them
 module.exports = {
-  fetchProfileAndWriteToFile: fetchProfileAndWriteToFile
+  fetchProfileAndWriteToFile
 };
